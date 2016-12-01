@@ -1,0 +1,16 @@
+    <% products.forEach(function(product, index) { %>
+        <div class="produtos" id="produto_<%- product.id %>">
+            <input type="hidden" name="id" value="<%- product.id %>">
+            <input type="hidden" name="preco" id="preco" value="<%- product.price %>">
+            <img src="../../images/camiseta<%- index %>.jpg" alt="Imagem" width="51" height="50">
+            <div class="caption">
+                <h4><%- product.title %></h4>
+                <p><%- product.availableSizes %> | <%- product.style %></p>
+                <p>Quantidade: 1</p>
+                <p class="valor"><%- product.currencyFormat %> <%- parseFloat(product.price).toFixed(2) %></p>
+            </div>
+            <span class="remove" id="<%- product.id %>">X</span>
+        </div>
+    <% }) %>
+
+    <script src="../javascripts/sacola.js"></script>

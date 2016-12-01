@@ -1,0 +1,41 @@
+<% include ../header.ejs %>
+<div class="container">
+    <a id="ver-sacola" href="/sacola">Ver Sacola</a>
+
+    <ul class="row">
+        <% products.forEach(function(product, index) { %>
+            <div class="col-sm-6 col-md-4">
+                <li class="thumbnail" id="produto_<%- product.id %>">
+                    <input type="hidden" name="id" value="<%- product.id %>">
+                    <img src="../../images/camiseta<%- index %>.jpg" alt="Imagem">
+                    <span class="caption">
+                        <h3><%- product.title %></h3>
+                        <p class="format-valor"><%- product.currencyFormat %>
+                            <span class=valor"><%- parseFloat(product.price).toFixed(2) %></span></p>
+                        <% if(product.installments) { %>
+                            <p class="parcelas">ou <%- product.installments %> x <%- parseFloat(product.price/product.installments).toFixed(2) %></p>
+                        <% } %>
+                    </span>
+                </li>
+            </div>
+        <% }) %>
+        <div class="clearfix visible-xs-block"></div>
+    </ul>
+
+    <div id="sacola">
+        <h3>SACOLA</h3>
+        <div id="lista-produto-seleciona"></div>
+
+        <ul>
+            <li class="label-subtotal">SUBTOTAL</li>
+            <li id="sub-total">
+                <p class="total">R$<span id="total"></span></p>
+                <p class="parcelas">OU EM AT&Eacute; 10x R$ <span id="valor-parcelado"></span></p>
+            </li>
+        </ul>
+
+        <div id="btn-comprar">Comprar</div>
+    </div>
+
+</div>
+<% include ../footer.ejs %>
