@@ -1,62 +1,71 @@
 (function() {
-    apendaEventoClique();
-    verSacola();
+    var principal = new Principal();
+    principal.apendaEventoClique();
+    principal.verSacola()
 })();
 
-function apendaEventoClique() {
-    var listaProdutos = document.getElementsByClassName("thumbnail");
+function Principal() {
 
-    for(var i = 0; i < listaProdutos.length; i++) {
-        listaProdutos[i].addEventListener('click', selecionaIDProduto, false);
-    }
-}
+    var $private = {};
+    var $public = this;
 
-function selecionaIDProduto(e) {
-    armazenaIDProdutoSessao(+e.currentTarget.children[0].value);
-}
+    $public.apendaEventoClique = function() {
+        var listaProdutos = document.getElementsByClassName("thumbnail");
 
-function armazenaIDProdutoSessao(produto) {
-    var listProdutos = [];
+        for(var i = 0; i < listaProdutos.length; i++) {
+            listaProdutos[i].addEventListener('click', $private.selecionaIDProduto, false);
+        }
+    };
 
-    if(sessionStorage.getItem('lista-produto')) {
-        listProdutos = JSON.parse(sessionStorage.getItem('lista-produto'));
-        if(listProdutos.indexOf(produto) == -1) {
+    $public.verSacola = function() {
+        $('#ver-sacola').on('click', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+
+            if($('#lista-produto-seleciona').find('.produtos').length == 0) {
+                $private.chamaControllerSacola(sessionStorage.getItem('lista-produto'));
+            }
+
+            $("#sacola").show();
+        });
+    };
+
+    $private.selecionaIDProduto = function(e) {
+        $private.armazenaIDProdutoSessao(+e.currentTarget.children[0].value);
+    };
+
+    $private.armazenaIDProdutoSessao = function(produto) {
+        var listProdutos = [];
+
+        if(sessionStorage.getItem('lista-produto')) {
+            listProdutos = JSON.parse(sessionStorage.getItem('lista-produto'));
+            if(listProdutos.indexOf(produto) == -1) {
+                listProdutos.push(produto);
+                $private.criaArrayIds(produto);
+            }
+        } else {
             listProdutos.push(produto);
+            $private.criaArrayIds(produto);
         }
-    } else {
+        sessionStorage.setItem('lista-produto', JSON.stringify(listProdutos));
+    };
+
+
+    $private.criaArrayIds = function(produto) {
+        var listProdutos = [];
         listProdutos.push(produto);
+        $private.chamaControllerSacola(JSON.stringify(listProdutos));
+    };
+
+    $private.chamaControllerSacola = function(listaIds) {
+        $.ajax({
+            type: "POST",
+            url: '/sacola',
+            type: 'POST',
+            data: {produtos: listaIds},
+            success: function(data) {
+                $("#lista-produto-seleciona").append(data);
+            }
+        });
     }
-    sessionStorage.setItem('lista-produto', JSON.stringify(listProdutos));
-    criaArrayIds(produto);
-}
-
-function criaArrayIds(produto) {
-    var listProdutos = [];
-    listProdutos.push(produto);
-    chamaControllerSacola(JSON.stringify(listProdutos));
-}
-
-function verSacola() {
-    $('#ver-sacola').on('click', function(e){
-        e.preventDefault();
-        e.stopPropagation();
-
-        if($('#lista-produto-seleciona').find('.produtos').length == 0) {
-            chamaControllerSacola(sessionStorage.getItem('lista-produto'));
-        }
-
-        $("#sacola").show();
-    });
-}
-
-function chamaControllerSacola(listaIds) {
-    $.ajax({
-        type: "POST",
-        url: '/sacola',
-        type: 'POST',
-        data: {produtos: listaIds},
-        success: function(data) {
-            $("#lista-produto-seleciona").append(data);
-        }
-    });
 }
